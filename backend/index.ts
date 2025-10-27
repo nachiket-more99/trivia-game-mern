@@ -17,20 +17,22 @@ const client = mongoose
     useNewUrlParser: true,
     useUnifiedTopology: true,
   })
-  .then(() => {
+  .then(async () => {
     console.log('\nConnected to the Database.\n');
+    await seedDB();
   })
   .catch((err: any) => console.error(err));
 
 
 const seedDB = async () => {
-  await Questions.deleteMany({});
-  await Questions.insertMany(seedQuestions);
+  const count = await Questions.countDocuments();
+  if (count === 0) {
+    await Questions.insertMany(seedQuestions);
+    console.log('\nQuestions seeded into triviagame_app\n');
+  } else {
+    console.log('\nQuestions already exist, skipping seed\n');
+  }
 }
-
-seedDB().then( ()=>{
-  console.log('q\nuestion seeded into triviagame_app\n')
-} )
 
 app.use(bodyParser.json())
 
