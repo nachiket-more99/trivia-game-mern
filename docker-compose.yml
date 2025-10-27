@@ -10,9 +10,9 @@ services:
     depends_on:
       - backend
     environment:
-      - REACT_APP_DOMAIN = "dev-7mpty06oczftshr2.us.auth0.com"
-      - REACT_APP_CLIENT_ID = "yAfTGPuAVz3jPLyPislzQJKeSRVwo7hU"
-      - PORT = 3000
+      - REACT_APP_DOMAIN=dev-7mpty06oczftshr2.us.auth0.com
+      - REACT_APP_CLIENT_ID=yAfTGPuAVz3jPLyPislzQJKeSRVwo7hU
+      - PORT=3000
     networks:
       - mern-network
   
@@ -25,8 +25,8 @@ services:
     depends_on:
       - database
     environment:
-      - MONGODB_PASS = "Jv75Nrir7d7yT7lG"
-      - PORT = 3001
+      - MONGODB_PASS=Jv75Nrir7d7yT7lG
+      - PORT=3001
     networks:
       - mern-network
   
@@ -39,8 +39,8 @@ services:
     ports:
       - "27017:27017"
     environment:
-      - MONGODB_PASS = "Jv75Nrir7d7yT7lG"
-      - PORT = 3001
+      - MONGODB_PASS=Jv75Nrir7d7yT7lG
+      - PORT=3001
     networks:
       - mern-network
   
