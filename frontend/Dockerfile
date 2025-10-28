@@ -10,17 +10,6 @@ COPY . .
 
 EXPOSE 3000
 
+ENV HOST=0.0.0.0
+
 CMD ["npm", "start"]
-
-
-
-# FROM node:18 as build-stage
-
-# # RUN npm install -g pnpm
-
-# WORKDIR /app
-# COPY package*.json /app/
-# RUN npm install --verbose
-
-# COPY ./ /app/
-# RUN npm build

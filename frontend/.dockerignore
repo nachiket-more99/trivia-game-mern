@@ -1,4 +1,3 @@
-node_modules/
-test/
-build/
-doc/
+node_modules
+build
+.env
