@@ -2,10 +2,8 @@ from pymongo.mongo_client import MongoClient
 
 uri = "mongodb://database:27017/triviagame_app"
 
-# Create a new client and connect to the server
 client = MongoClient(uri)
 
-# Send a ping to confirm a successful connection
 try:
     client.admin.command('ping')
     print("Pinged your deployment. You successfully connected to MongoDB!")
@@ -16,13 +14,15 @@ db = client.triviagame_app
 collection_name = db["leaderboard"]
 
 def seed_collection():
-    collection_name.delete_many({})
-    data = [
-        {"username": "user-test@gmail.com", "correct_answers": 4, "date": ""},
-        {"username": "email@email.com", "correct_answers": 5, "date": ""}
-    ]
-    
-    for document in data:
-        collection_name.insert_one(document)
+    count = collection_name.count_documents({})
+    if count == 0:
+        data = [
+            {"username": "user-test@gmail.com", "correct_answers": 4, "date": ""},
+            {"username": "email@email.com", "correct_answers": 5, "date": ""}
+        ]
+        collection_name.insert_many(data)
+        print("Leaderboard seeded!")
+    else:
+        print("Leaderboard already has data, skipping seed.")
 
 seed_collection()
