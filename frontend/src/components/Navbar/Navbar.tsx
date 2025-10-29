@@ -1,5 +1,5 @@
 import * as React from "react";
-import { Button, Dropdown } from "react-bootstrap";
+import { Button } from "react-bootstrap";
 import { useNavigate } from "react-router-dom";
 import { useAuth0 } from "@auth0/auth0-react";
 
@@ -13,43 +13,114 @@ type ContainerProps = {
 const Navbar = (props: ContainerProps) => {
   const { loginWithRedirect, logout, user, isAuthenticated, isLoading } =
     useAuth0();
+  const navigate = useNavigate();
+  const [dropdownOpen, setDropdownOpen] = React.useState(false);
+  const [imgError, setImgError] = React.useState(false);
+
+  React.useEffect(() => {
+    const handleClickOutside = (e: MouseEvent) => {
+      const menu = document.getElementById("nav-user-menu");
+      if (menu && !menu.contains(e.target as Node)) {
+        setDropdownOpen(false);
+      }
+    };
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
 
   return (
-    <div className="navbar-container">
-      <div id="user-details-container">
-        {user == undefined && !isAuthenticated && (
-          <div>
-            <Button
-              id="login-button"
-              variant="secondary"
-              onClick={() => loginWithRedirect()}
-            >
-              LOG IN
-            </Button>
-            <Button id="signin-button">SIGN UP</Button>
-          </div>
-        )}
-        {user !== undefined && isAuthenticated && (
-          <Dropdown id="user-details">
-            <Dropdown.Toggle variant="success" id="dropdown-basic">
-              <img src={user.picture} alt={user.name} />
-            </Dropdown.Toggle>
+    <div className="app-container">
+      <nav className="app-nav">
+        <div className="nav-logo" onClick={() => navigate("/")}>
+          <div className="nav-logo-icon">Q</div>
+          TriviaGame
+        </div>
 
-            <Dropdown.Menu>
-              <Dropdown.Item>{user.name}</Dropdown.Item>
-              <Dropdown.Item href="/leaderboard">Leaderboard</Dropdown.Item>
-              <Dropdown.Item
-                id="dropdown-logout"
+        <div className="nav-right">
+          {!isLoading && user === undefined && !isAuthenticated && (
+            <>
+              <Button
+                className="nav-btn-ghost"
+                onClick={() => navigate("/leaderboard")}
+              >
+                Leaderboard
+              </Button>
+              <Button
+                className="nav-btn-ghost"
+                onClick={() => loginWithRedirect()}
+              >
+                Log in
+              </Button>
+              <Button
+                className="nav-btn-primary"
                 onClick={() =>
-                  logout({ logoutParams: { returnTo: window.location.origin } })
+                  loginWithRedirect({
+                    authorizationParams: { screen_hint: "signup" },
+                  })
                 }
               >
-                Loug Out
-              </Dropdown.Item>
-            </Dropdown.Menu>
-          </Dropdown>
-        )}
-      </div>
+                Sign up
+              </Button>
+            </>
+          )}
+
+          {!isLoading && user !== undefined && isAuthenticated && (
+            <>
+              <Button
+                className="nav-btn-ghost"
+                onClick={() => navigate("/leaderboard")}
+              >
+                Leaderboard
+              </Button>
+              <div className="nav-user-menu" id="nav-user-menu">
+                <div
+                  className="nav-avatar-trigger"
+                  onClick={() => setDropdownOpen(!dropdownOpen)}
+                >
+                  {!imgError && user.picture ? (
+                    <img
+                      src={user.picture}
+                      alt=""
+                      className="nav-avatar"
+                      onError={() => setImgError(true)}
+                    />
+                  ) : (
+                    <div className="nav-avatar-initials">
+                      {user.nickname?.slice(0, 2).toUpperCase() || user.name?.slice(0, 2).toUpperCase() || "U"}
+
+                    </div>
+                  )}
+                </div>
+
+                {dropdownOpen && (
+                  <div className="nav-dropdown">
+                    <div className="nav-dropdown-item">{user.name}</div>
+                    <div
+                      className="nav-dropdown-item"
+                      onClick={() => {
+                        navigate("/leaderboard");
+                        setDropdownOpen(false);
+                      }}
+                    >
+                      Leaderboard
+                    </div>
+                    <div
+                      className="nav-dropdown-logout"
+                      onClick={() =>
+                        logout({
+                          logoutParams: { returnTo: window.location.origin },
+                        })
+                      }
+                    >
+                      Log out
+                    </div>
+                  </div>
+                )}
+              </div>
+            </>
+          )}
+        </div>
+      </nav>
 
       {props.children}
     </div>
