@@ -1,29 +1,21 @@
 import * as React from "react";
-import { Button, Form, Card, Spinner, Col, Dropdown } from "react-bootstrap";
+import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth0 } from "@auth0/auth0-react";
+import Navbar from "../Navbar/Navbar";
 
 import "bootstrap/dist/css/bootstrap.min.css";
 import "./GameScreen.css";
 
-import Navbar from "../Navbar/Navbar";
-
-import { useState } from "react";
-
 function QuizComponent() {
-  const { loginWithRedirect, logout, user, isAuthenticated, isLoading } =
-    useAuth0();
+  const { user } = useAuth0();
   const navigate = useNavigate();
 
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
   const [quizQuestionsList, setQuizQuestionsList] = useState([
     {
       question: "question",
-      options: {
-        1: "option1",
-        2: "option2",
-        3: "option3",
-      },
+      options: { 1: "option1", 2: "option2", 3: "option3" },
       answer: 1,
     },
   ]);
@@ -35,6 +27,10 @@ function QuizComponent() {
   const [showEndScreen, setShowEndScreen] = React.useState(false);
   const [selected, setSelected] = useState<number[]>([]);
   const [finalScore, setFinalScore] = React.useState(0);
+  const [selectedOption, setSelectedOption] = React.useState<string | null>(
+    null,
+  );
+  const [answered, setAnswered] = React.useState(false);
 
   React.useEffect(() => {
     fetch("/question/list")
@@ -42,9 +38,7 @@ function QuizComponent() {
       .then((data) => {
         setQuizQuestionsList(data.questionList);
       })
-      .catch((err) => {
-        console.log(err.message);
-      });
+      .catch((err) => console.log(err.message));
   }, []);
 
   const postScore = async (score: number) => {
@@ -57,23 +51,15 @@ function QuizComponent() {
           correct_answers: score,
           date: new Date().toISOString().slice(0, 10),
         }),
-      })
-        .then((response) => {
-          console.log(response);
-        })
-        .catch((err) => {
-          console.log(err.message);
-        });
+      }).catch((err) => console.log(err.message));
     }
   };
 
-  const calculateScore = () => {
+  const calculateScore = (answers: number[]) => {
     setShowLoading(false);
-    const matchingCount = selected.reduce((count, value, index) => {
+    const matchingCount = answers.reduce((count, value, index) => {
       const { answer } = quizQuestionsList[index];
-      if (Number(value) === answer) {
-        return count + 1;
-      }
+      if (Number(value) === answer) return count + 1;
       return count;
     }, 0);
     postScore(matchingCount);
@@ -81,82 +67,140 @@ function QuizComponent() {
     setShowEndScreen(true);
   };
 
-  const handleNextQuestion = (event: any) => {
-    setSelected((oldArray) => [...oldArray, event.target.value]);
-    if (currentQuestionIndex == quizQuestionsList.length - 1) {
-      setShowLoading(true);
-      setShowGameScreen(false);
-    } else {
-      setCurrentQuestionIndex((prevIndex) => prevIndex + 1);
-    }
+  const handleOptionClick = (optionKey: string) => {
+    if (answered) return;
+    setSelectedOption(optionKey);
+    setAnswered(true);
+
+    setTimeout(() => {
+      const newSelected = [...selected, parseInt(optionKey)];
+      setSelected(newSelected);
+      setSelectedOption(null);
+      setAnswered(false);
+
+      if (currentQuestionIndex === quizQuestionsList.length - 1) {
+        setShowLoading(true);
+        setShowGameScreen(false);
+        calculateScore(newSelected);
+      } else {
+        setCurrentQuestionIndex((prev) => prev + 1);
+      }
+    }, 800);
   };
 
-  React.useEffect(() => {
-    if (selected.length == 5) {
-      calculateScore();
-    }
-  }, [selected]);
+  const getOptionClass = (optionKey: string) => {
+    if (!answered || selectedOption === null) return "g-opt";
+    const isCorrect = parseInt(optionKey) === currentQuestion.answer;
+    const isSelected = optionKey === selectedOption;
+    if (isSelected && isCorrect) return "g-opt correct";
+    if (isSelected && !isCorrect) return "g-opt wrong";
+    if (!isSelected && isCorrect) return "g-opt correct";
+    return "g-opt";
+  };
 
-  const handleOpenLeaderboard = () => {
-    navigate("/leaderboard");
+  const optionLabels: { [key: string]: string } = {
+    "1": "A",
+    "2": "B",
+    "3": "C",
+    "4": "D",
+  };
+
+  const currentScore = selected.reduce((count, value, index) => {
+    if (Number(value) === quizQuestionsList[index]?.answer) return count + 1;
+    return count;
+  }, 0);
+
+  const progressPercent =
+    (currentQuestionIndex / quizQuestionsList.length) * 100;
+
+  const getEndContent = () => {
+    const total = quizQuestionsList.length;
+    const percent = (finalScore / total) * 100;
+    if (percent === 100)
+      return {
+        emoji: "🎉",
+        title: "Perfect score!",
+        sub: `You got all ${total} correct!`,
+      };
+    if (percent >= 60)
+      return {
+        emoji: "🙌",
+        title: "Good job!",
+        sub: `You got ${finalScore} out of ${total} correct`,
+      };
+    if (percent >= 20)
+      return {
+        emoji: "💪",
+        title: "Nice try!",
+        sub: `You got ${finalScore} out of ${total} correct`,
+      };
+    return {
+      emoji: "😅",
+      title: "Better luck next time!",
+      sub: `You got ${finalScore} out of ${total} correct`,
+    };
   };
 
   return (
     <Navbar>
-      <div className="bg">
+      <div className="game-wrapper">
         {showLoading && (
-          <div className="spinner-container">
-            <Spinner animation="border" role="status">
-              <span className="visually-hidden">Loading...</span>
-            </Spinner>
+          <div className="game-spinner">
+            <div className="spinner-ring"></div>
           </div>
         )}
+
         {!showLoading && showGameScreen && (
-          <div className="game-bg">
-            <Card className="game-card">
-              <Card.Body>
-                <div className="trivia-card">
-                  <Card>
-                    <Card.Header>{currentQuestion.question}</Card.Header>
-                    <Card.Body>
-                      <Card.Text>
-                        {Object.entries(currentQuestion.options).map(
-                          ([optionKey, optionValue]) => (
-                            <Button
-                              className="mt-4"
-                              id="option-btn"
-                              variant="primary"
-                              onClick={handleNextQuestion}
-                              value={optionKey}
-                            >
-                              {optionValue}
-                            </Button>
-                          )
-                        )}
-                      </Card.Text>
-                    </Card.Body>
-                  </Card>
+          <div className="game-body">
+            <div className="game-card">
+              <div className="game-top">
+                <div className="game-counter">
+                  Question {currentQuestionIndex + 1} of{" "}
+                  {quizQuestionsList.length}
                 </div>
-              </Card.Body>
-            </Card>
+                <div className="game-score-badge">Score: {currentScore}</div>
+              </div>
+
+              <div className="game-progress">
+                <div
+                  className="game-progress-fill"
+                  style={{ width: `${progressPercent}%` }}
+                ></div>
+              </div>
+
+              <div className="game-question">{currentQuestion.question}</div>
+
+              <div className="game-options">
+                {Object.entries(currentQuestion.options).map(
+                  ([optionKey, optionValue]) => (
+                    <div
+                      key={optionKey}
+                      className={getOptionClass(optionKey)}
+                      onClick={() => handleOptionClick(optionKey)}
+                    >
+                      <div className="game-opt-key">
+                        {optionLabels[optionKey] || optionKey}
+                      </div>
+                      {optionValue}
+                    </div>
+                  ),
+                )}
+              </div>
+            </div>
           </div>
         )}
+
         {showEndScreen && (
-          <div className="game-finish-container">
-            <h2 className="heading">Good Job!</h2>
-            <h4 className="sub-heading">
-              you got {finalScore} out of 5 correct
-            </h4>
-            <div>
-              <Button
-                variant="primary"
-                className="mt-4"
-                id="open-leaderboard"
-                onClick={handleOpenLeaderboard}
-              >
-                LEADERBOARD
-              </Button>
-            </div>
+          <div className="game-end">
+            <div className="game-end-circle">{getEndContent().emoji}</div>
+            <h2 className="game-end-title">{getEndContent().title}</h2>
+            <p className="game-end-sub">{getEndContent().sub}</p>
+            <button
+              className="game-end-btn"
+              onClick={() => navigate("/leaderboard")}
+            >
+              View leaderboard
+            </button>
           </div>
         )}
       </div>
