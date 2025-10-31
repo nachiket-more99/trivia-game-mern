@@ -31,6 +31,9 @@ function QuizComponent() {
     null,
   );
   const [answered, setAnswered] = React.useState(false);
+  const [startTime] = React.useState<number>(Date.now());
+  const [timeSeconds, setTimeSeconds] = React.useState<number>(0);
+
 
   React.useEffect(() => {
     fetch("/question/list")
@@ -41,31 +44,35 @@ function QuizComponent() {
       .catch((err) => console.log(err.message));
   }, []);
 
-  const postScore = async (score: number) => {
-    if (user !== undefined) {
-      await fetch("http://localhost:8000/", {
-        method: "post",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          username: user.name,
-          correct_answers: score,
-          date: new Date().toISOString().slice(0, 10),
-        }),
-      }).catch((err) => console.log(err.message));
-    }
-  };
+  const postScore = async (score: number, timeSeconds: number) => {
+  if (user !== undefined) {
+    await fetch("http://localhost:8000/", {
+      method: "post",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        username: user.name,
+        correct_answers: score,
+        date: new Date().toISOString().slice(0, 10),
+        time_seconds: timeSeconds,
+      }),
+    }).catch((err) => console.log(err.message));
+  }
+};
 
-  const calculateScore = (answers: number[]) => {
-    setShowLoading(false);
-    const matchingCount = answers.reduce((count, value, index) => {
-      const { answer } = quizQuestionsList[index];
-      if (Number(value) === answer) return count + 1;
-      return count;
-    }, 0);
-    postScore(matchingCount);
-    setFinalScore(matchingCount);
-    setShowEndScreen(true);
-  };
+
+const calculateScore = (answers: number[]) => {
+  setShowLoading(false);
+  const timeSeconds = Math.round((Date.now() - startTime) / 1000);
+  const matchingCount = answers.reduce((count, value, index) => {
+    const { answer } = quizQuestionsList[index];
+    if (Number(value) === answer) return count + 1;
+    return count;
+  }, 0);
+  postScore(matchingCount, timeSeconds);
+  setFinalScore(matchingCount);
+  setTimeSeconds(timeSeconds);
+  setShowEndScreen(true);
+};
 
   const handleOptionClick = (optionKey: string) => {
     if (answered) return;
@@ -113,33 +120,15 @@ function QuizComponent() {
   const progressPercent =
     (currentQuestionIndex / quizQuestionsList.length) * 100;
 
-  const getEndContent = () => {
-    const total = quizQuestionsList.length;
-    const percent = (finalScore / total) * 100;
-    if (percent === 100)
-      return {
-        emoji: "🎉",
-        title: "Perfect score!",
-        sub: `You got all ${total} correct!`,
-      };
-    if (percent >= 60)
-      return {
-        emoji: "🙌",
-        title: "Good job!",
-        sub: `You got ${finalScore} out of ${total} correct`,
-      };
-    if (percent >= 20)
-      return {
-        emoji: "💪",
-        title: "Nice try!",
-        sub: `You got ${finalScore} out of ${total} correct`,
-      };
-    return {
-      emoji: "😅",
-      title: "Better luck next time!",
-      sub: `You got ${finalScore} out of ${total} correct`,
-    };
-  };
+const getEndContent = () => {
+  const total = quizQuestionsList.length;
+  const percent = (finalScore / total) * 100;
+  const timeText = `${timeSeconds}s`;
+  if (percent === 100) return { emoji: "🎉", title: "Perfect score!", sub: `All ${total} correct in ${timeText}` };
+  if (percent >= 60) return { emoji: "🙌", title: "Good job!", sub: `${finalScore} of ${total} correct in ${timeText}` };
+  if (percent >= 20) return { emoji: "💪", title: "Nice try!", sub: `${finalScore} of ${total} correct in ${timeText}` };
+  return { emoji: "😅", title: "Better luck next time!", sub: `${finalScore} of ${total} correct in ${timeText}` };
+};
 
   return (
     <Navbar>
