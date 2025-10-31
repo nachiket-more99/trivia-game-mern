@@ -22,9 +22,31 @@ async def get_record(id: str):
 #CREATE record
 @leaderboard_app_router.post("/")
 async def post_record(record: Leaderboard):
-    _id = collection_name.insert_one(dict(record))
-    record = records_serializer(collection_name.find({"_id": _id.inserted_id}))
-    return {"status": "ok", "data": record}
+    existing = collection_name.find_one({"username": record.username})
+    
+    if existing is None:
+        _id = collection_name.insert_one(dict(record))
+        new_record = record_serializer(collection_name.find_one({"_id": _id.inserted_id}))
+        return {"status": "ok", "data": new_record}
+    
+    existing_score = existing.get("correct_answers", 0)
+    existing_time = existing.get("time_seconds", None)
+    new_score = record.correct_answers
+    new_time = record.time_seconds
+
+    is_better = (new_score > existing_score) or \
+                (new_score == existing_score and new_time is not None and 
+                 (existing_time is None or new_time < existing_time))
+
+    if is_better:
+        collection_name.find_one_and_update(
+            {"username": record.username},
+            {"$set": dict(record)}
+        )
+        updated = record_serializer(collection_name.find_one({"username": record.username}))
+        return {"status": "ok", "data": updated}
+    
+    return {"status": "ok", "data": record_serializer(existing)}
 
 @leaderboard_app_router.put('/{id}')
 async def update_record(id:str, record: Leaderboard):
