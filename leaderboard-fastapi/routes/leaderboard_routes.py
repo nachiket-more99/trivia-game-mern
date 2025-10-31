@@ -9,7 +9,9 @@ leaderboard_app_router = APIRouter()
 #GET all
 @leaderboard_app_router.get("/")
 async def get_records():
-    records = records_serializer(collection_name.find())
+    records = records_serializer(
+        collection_name.find().sort([("correct_answers", -1), ("time_seconds", 1)])
+    )
     return {"status": "ok", "data": records}
 
 #GET by id
