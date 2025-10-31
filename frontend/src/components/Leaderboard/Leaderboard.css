@@ -1,15 +1,117 @@
-.leaderboard-bg{
-    color: #EDEEEE;
-    padding: 20px;
-    height: fit-content;
-    width: 500px;
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    text-align: center;
+.lb-wrapper {
+  min-height: calc(100vh - 70px);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 48px 32px;
 }
-.leaderboard-heading {
-    font-weight: 600;
-    margin: 30px 0;
+
+.lb-header {
+  text-align: center;
+  margin-bottom: 32px;
+}
+
+.lb-title {
+  font-size: 24px;
+  font-weight: 500;
+  color: #fff;
+  margin-bottom: 6px;
+}
+
+.lb-sub {
+  font-size: 13px;
+  color: rgba(255, 255, 255, 0.35);
+  margin: 0;
+}
+
+.lb-table {
+  width: 100%;
+  max-width: 600px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.lb-cols {
+  display: grid;
+  grid-template-columns: 48px 1fr 80px 80px;
+  padding: 0 18px;
+  font-size: 11px;
+  color: rgba(255, 255, 255, 0.25);
+  margin-bottom: 4px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.lb-row {
+  display: grid;
+  grid-template-columns: 48px 1fr 80px 80px;
+  align-items: center;
+  background: rgba(255, 255, 255, 0.04);
+  border: 0.5px solid rgba(255, 255, 255, 0.08);
+  border-radius: 12px;
+  padding: 14px 18px;
+}
+
+.lb-row.top1 {
+  border-color: rgba(251, 191, 36, 0.3);
+  background: rgba(251, 191, 36, 0.06);
+}
+
+.lb-row.top2 {
+  border-color: rgba(148, 163, 184, 0.3);
+  background: rgba(148, 163, 184, 0.06);
+}
+
+.lb-row.top3 {
+  border-color: rgba(180, 120, 60, 0.3);
+  background: rgba(180, 120, 60, 0.06);
+}
+
+.lb-row.me {
+  border-color: rgba(167, 139, 250, 0.3);
+  background: rgba(167, 139, 250, 0.06);
+}
+
+.lb-rank {
+  font-size: 18px;
+  text-align: center;
+}
+
+.lb-username {
+  font-size: 14px;
+  color: rgba(255, 255, 255, 0.8);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.lb-you {
+  font-size: 10px;
+  color: #a78bfa;
+  background: rgba(167, 139, 250, 0.12);
+  border: 0.5px solid rgba(167, 139, 250, 0.3);
+  padding: 2px 8px;
+  border-radius: 999px;
+}
+
+.lb-time {
+  font-size: 13px;
+  color: rgba(255, 255, 255, 0.4);
+  text-align: center;
+}
+
+.lb-score-wrap {
+  text-align: right;
+}
+
+.lb-score {
+  font-size: 18px;
+  font-weight: 500;
+  color: #fff;
+}
+
+.lb-score-lbl {
+  font-size: 11px;
+  color: rgba(255, 255, 255, 0.3);
 }

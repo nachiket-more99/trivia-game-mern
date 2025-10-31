@@ -1,5 +1,4 @@
 import React, { useEffect, useState } from "react";
-import { Table } from "react-bootstrap";
 import { useAuth0 } from "@auth0/auth0-react";
 import Navbar from "../Navbar/Navbar";
 
@@ -10,51 +9,80 @@ interface Score {
   id: string;
   username: string;
   correct_answers: number;
+  time_seconds: number | null;
 }
 
 function Leaderboard() {
-  const { loginWithRedirect, logout, user, isAuthenticated, isLoading } =
-    useAuth0();
-
+  const { user } = useAuth0();
   const [scores, setScores] = useState<Score[]>([]);
 
   useEffect(() => {
     fetch("http://localhost:8000/")
       .then((response) => response.json())
       .then((data) => {
-        let sortedScores = data.data.sort(function (a: any, b: any) {
-          return b.correct_answers - a.correct_answers;
-        });
-        setScores(sortedScores);
+        setScores(data.data);
       })
-      .catch((err) => {
-        console.log(err.message);
-      });
+      .catch((err) => console.log(err.message));
   }, []);
+
+  const getRankDisplay = (index: number) => {
+    if (index === 0) return "🥇";
+    if (index === 1) return "🥈";
+    if (index === 2) return "🥉";
+    return index + 1;
+  };
+
+  const getRowClass = (index: number, username: string) => {
+    const isMe = user?.name === username;
+    if (index === 0) return "lb-row top1";
+    if (index === 1) return "lb-row top2";
+    if (index === 2) return "lb-row top3";
+    if (isMe) return "lb-row me";
+    return "lb-row";
+  };
+
+  const formatTime = (seconds: number | null) => {
+    if (seconds === null || seconds === undefined) return "-";
+    if (seconds < 60) return `${seconds}s`;
+    const m = Math.floor(seconds / 60);
+    const s = seconds % 60;
+    return `${m}m ${s}s`;
+  };
 
   return (
     <Navbar>
-      <div className="bg">
-        <div className="leaderboard-bg">
-          <h2 className="leaderboard-heading">Leaderboard</h2>
-          <Table striped bordered hover>
-            <thead>
-              <tr>
-                <th>Rank</th>
-                <th>Username</th>
-                <th>Score</th>
-              </tr>
-            </thead>
-            <tbody>
-              {scores.map((score, index) => (
-                <tr key={score.id}>
-                  <td>{index + 1}</td>
-                  <td>{score.username}</td>
-                  <td>{score.correct_answers}</td>
-                </tr>
-              ))}
-            </tbody>
-          </Table>
+      <div className="lb-wrapper">
+        <div className="lb-header">
+          <h2 className="lb-title">Leaderboard</h2>
+          <p className="lb-sub">Top scores from all players</p>
+        </div>
+
+        <div className="lb-table">
+          <div className="lb-cols">
+            <span>Rank</span>
+            <span>Player</span>
+            <span>Time</span>
+            <span>Score</span>
+          </div>
+
+          {scores.map((score, index) => (
+            <div key={score.id} className={getRowClass(index, score.username)}>
+              <div className="lb-rank">{getRankDisplay(index)}</div>
+              <div className="lb-user">
+                <div className="lb-username">
+                  {score.username}
+                  {user?.name === score.username && (
+                    <span className="lb-you">you</span>
+                  )}
+                </div>
+              </div>
+              <div className="lb-time">{formatTime(score.time_seconds)}</div>
+              <div className="lb-score-wrap">
+                <div className="lb-score">{score.correct_answers}</div>
+                <div className="lb-score-lbl">correct</div>
+              </div>
+            </div>
+          ))}
         </div>
       </div>
     </Navbar>
