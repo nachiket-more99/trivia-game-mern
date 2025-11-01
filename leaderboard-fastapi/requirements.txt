@@ -1,4 +1,4 @@
 fastapi 
-pymongo 
+pymongo[srv]==4.6.1 
 uvicorn
 python-dotenv
