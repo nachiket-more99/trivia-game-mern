@@ -1,70 +1,67 @@
+# TriviaGame - Full Stack Dev Quiz
 
-# CS-565-002-Full-Stack Final Project
+A full stack trivia game focused on web development topics. Built with a MERN stack + FastAPI microservice, containerized with Docker, and secured with Auth0 authentication.
 
-This is the final project for the Full Stack Web Development course. The application is an TriviaGame of Full stack related question developed by Nachiket More, a student at the Portland State University.
+## Tech Stack
 
-## Technologies Used
+**Frontend**
+- React + TypeScript
+- Bootstrap + custom CSS
+- Auth0 for authentication
 
- - React
- - TypeScript
- - CSS
- - Bootstrap
- - Node.js
- - Express.js
- - MongoDB
- - Python
- - FastAPI
- - Docker
+**Backend**
+- Node.js + Express.js
+- MongoDB + Mongoose
 
+**Microservice**
+- Python + FastAPI
+- PyMongo
+
+**Infrastructure**
+- Docker + Docker Compose
 
 ## Features
-The website is a single-page application that includes the following features:
 
-- Minimal app design with Home Page  
-- Navbar with on different pages with option to login or signup to the account(Auth0)
-- Interactive GameScreen with questions related to Full stack with 3 options to select from
-- Leaderboard feature showing all the games played by al players and ranking based on the points scored.
-
+- Dark-themed UI with responsive layout
+- Auth0 login / signup
+- Interactive quiz with 5 full stack questions (React, Node.js, Docker, MongoDB and more)
+- Live progress bar and score tracker during gameplay
+- Green/red answer feedback with correct answer reveal
+- Dynamic end screen based on score and completion time
+- Leaderboard with trophy icons for top 3, sorted by score then fastest time
+- Only best score per user is kept on the leaderboard
+- Current user highlighted on leaderboard
 
 ## Run Locally
 
-Clone the project
-
+Make sure Docker Desktop is running, then:
 ```bash
-  git clone git@github.com:nachiket-more/CS-565-002-Full-Stack-Project.git
+git clone https://github.com/nachiket-more99/trivia-game-mern.git
+cd trivia-game-mern
+docker compose up
 ```
 
-Go to the project directory
+Open `http://localhost:3000` in your browser.
 
-```bash
-  cd CS-565-002-Full-Stack-Project
-```
+## API Endpoints
 
+**Express backend - port 3001**
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| GET | `/question/list` | Get all questions |
+| POST | `/question/create` | Create a question |
+| GET | `/question/:id` | Get question by ID |
+| PATCH | `/question/:id` | Update question |
+| DELETE | `/question/:id` | Delete question |
 
-Start the Docker Live server. This will start all the services
-
-```bash
-  docker compose up
-```
-Play the TriviaGame
-
-```bash
-  http:localhost:3000/
-```
-
-
-
-## Resources
-- [Ref: Geography Quiz](https://quiz-app-gneng.vercel.app/)
-- [React bootstrap](https://react-bootstrap.netlify.app/)
-- [Dockerizing a MERN Stack Web Application](https://medium.com/mozilla-club-bbsr/dockerizing-a-mern-stack-web-application-ebf78babf136)
-- [Run MongoDB with Docker guide](https://geshan.com.np/blog/2023/03/mongodb-docker-compose/)
-- [Getting Started with MongoDB and FastAPI](https://www.mongodb.com/developer/languages/python/python-quickstart-fastapi/)
-
-
-
-
+**FastAPI microservice - port 8000**
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| GET | `/` | Get leaderboard (sorted by score, time) |
+| POST | `/` | Submit score (keeps best score per user) |
+| PUT | `/{id}` | Update record |
+| DELETE | `/{id}` | Delete record |
 
 ## Contact
 
-If you have any questions or feedback regarding this project, please feel free to contact me at nachiket.more@pdx.edu
+Nachiket More - nachiketmore.more@gmail.com
