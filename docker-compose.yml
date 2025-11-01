@@ -12,7 +12,7 @@ services:
     environment:
       - REACT_APP_DOMAIN=dev-7mpty06oczftshr2.us.auth0.com
       - REACT_APP_CLIENT_ID=yAfTGPuAVz3jPLyPislzQJKeSRVwo7hU
-      - PORT=3000
+      - PORT=${FRONTEND_PORT}
     networks:
       - mern-network
   
@@ -21,12 +21,12 @@ services:
     build: ./backend/
     restart: always
     ports:
-      - "3001:3001"
+      - "5000:5000"
     depends_on:
       - database
     environment:
-      - MONGODB_PASS=Jv75Nrir7d7yT7lG
-      - PORT=3001
+      - MONGO_URI=${MONGO_URI}
+      - PORT=${BACKEND_PORT}
     networks:
       - mern-network
   
@@ -52,6 +52,8 @@ services:
       - 8000:8000
     depends_on:
       - database
+    environment:
+      - MONGO_URI=${MONGO_URI}
     networks:
       - mern-network
 
