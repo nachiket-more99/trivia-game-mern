@@ -12,17 +12,23 @@ require('dotenv').config({ path: './.env' })
 app.use(cors())
 app.options('*', cors()) 
 
-const client = mongoose
-  .connect("mongodb://database:27017/triviagame_app", {
-    useNewUrlParser: true,
-    useUnifiedTopology: true,
+const uri = process.env.MONGO_URI;
+
+if (!uri) {
+  throw new Error("MONGO_URI not set");
+}
+
+
+mongoose.connect(uri, {
+  useNewUrlParser: true,
+  useUnifiedTopology: true,
   })
   .then(async () => {
-    console.log('\nConnected to the Database.\n');
+    console.log("Connected DB:", mongoose.connection.name);
+    console.log("Host:", mongoose.connection.host);
     await seedDB();
   })
   .catch((err: any) => console.error(err));
-
 
 const seedDB = async () => {
   const count = await Questions.countDocuments();
@@ -40,5 +46,5 @@ app.use('/question', gameRecordRoute);
 
 
 app.listen(process.env.PORT, () => {
-    console.log(`\nserver started at http://backend:`+process.env.PORT+'\n');
+    console.log(`\nserver started at http://localhost:`+process.env.PORT+'\n');
 });
