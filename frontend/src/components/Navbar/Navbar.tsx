@@ -15,7 +15,6 @@ const Navbar = (props: ContainerProps) => {
     useAuth0();
   const navigate = useNavigate();
   const [dropdownOpen, setDropdownOpen] = React.useState(false);
-  const [imgError, setImgError] = React.useState(false);
 
   React.useEffect(() => {
     const handleClickOutside = (e: MouseEvent) => {
