@@ -12,12 +12,14 @@ interface Score {
   time_seconds: number | null;
 }
 
+const FASTAPI_URL = process.env.REACT_APP_FASTAPI_URL || "http://localhost:8000";
+
 function Leaderboard() {
   const { user } = useAuth0();
   const [scores, setScores] = useState<Score[]>([]);
 
   useEffect(() => {
-    fetch("http://localhost:8000/")
+    fetch(`${FASTAPI_URL}/`)
       .then((response) => response.json())
       .then((data) => {
         setScores(data.data);

@@ -73,24 +73,11 @@ const Navbar = (props: ContainerProps) => {
                 Leaderboard
               </Button>
               <div className="nav-user-menu" id="nav-user-menu">
-                <div
-                  className="nav-avatar-trigger"
-                  onClick={() => setDropdownOpen(!dropdownOpen)}
-                >
-                  {!imgError && user.picture ? (
-                    <img
-                      src={user.picture}
-                      alt=""
-                      className="nav-avatar"
-                      onError={() => setImgError(true)}
-                    />
-                  ) : (
-                    <div className="nav-avatar-initials">
-                      {user.nickname?.slice(0, 2).toUpperCase() || user.name?.slice(0, 2).toUpperCase() || "U"}
-
-                    </div>
-                  )}
-                </div>
+<div className="nav-avatar-trigger" onClick={() => setDropdownOpen(!dropdownOpen)}>
+  <div className="nav-avatar-initials">
+    {user.nickname?.slice(0, 2).toUpperCase() || user.name?.slice(0, 2).toUpperCase() || "U"}
+  </div>
+</div>
 
                 {dropdownOpen && (
                   <div className="nav-dropdown">

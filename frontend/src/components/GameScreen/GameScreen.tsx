@@ -7,6 +7,9 @@ import Navbar from "../Navbar/Navbar";
 import "bootstrap/dist/css/bootstrap.min.css";
 import "./GameScreen.css";
 
+const BACKEND_URL = process.env.REACT_APP_BACKEND_URL || "";
+const FASTAPI_URL = process.env.REACT_APP_FASTAPI_URL || "http://localhost:8000";
+
 function QuizComponent() {
   const { user } = useAuth0();
   const navigate = useNavigate();
@@ -35,7 +38,7 @@ function QuizComponent() {
   const [timeSeconds, setTimeSeconds] = React.useState<number>(0);
 
   React.useEffect(() => {
-    fetch("/question/list")
+    fetch(`${BACKEND_URL}/question/list`)
       .then((response) => response.json())
       .then((data) => {
         setQuizQuestionsList(data.questionList);
@@ -45,7 +48,7 @@ function QuizComponent() {
 
   const postScore = async (score: number, timeSeconds: number) => {
     if (user !== undefined) {
-      await fetch("http://localhost:8000/", {
+      await fetch(`${FASTAPI_URL}/`, {
         method: "post",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({

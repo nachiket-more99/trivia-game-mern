@@ -10,8 +10,8 @@ services:
     depends_on:
       - backend
     environment:
-      - REACT_APP_DOMAIN=dev-7mpty06oczftshr2.us.auth0.com
-      - REACT_APP_CLIENT_ID=yAfTGPuAVz3jPLyPislzQJKeSRVwo7hU
+      - REACT_APP_DOMAIN=${REACT_APP_DOMAIN}
+      - REACT_APP_CLIENT_ID=${REACT_APP_CLIENT_ID}
       - PORT=${FRONTEND_PORT}
     networks:
       - mern-network
