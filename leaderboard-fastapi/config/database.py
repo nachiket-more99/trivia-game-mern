@@ -1,12 +1,13 @@
 from pymongo.mongo_client import MongoClient
+import os
 
-uri = "mongodb://database:27017/triviagame_app"
+uri = os.getenv("MONGO_URI")
 
 client = MongoClient(uri)
 
 try:
     client.admin.command('ping')
-    print("Pinged your deployment. You successfully connected to MongoDB!")
+    print("Successfully connected to MongoDB!")
 except Exception as e:
     print(e)
 

@@ -1,6 +1,8 @@
 from fastapi import FastAPI
 from routes.leaderboard_routes import leaderboard_app_router
 from fastapi.middleware.cors import CORSMiddleware
+from dotenv import load_dotenv
+load_dotenv()
 
 app = FastAPI()
 
