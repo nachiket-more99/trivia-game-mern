@@ -16,4 +16,11 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+@app.get("/health")
+async def health_check():
+    return {
+        "status": "ok",
+        "message": "FastAPI backend is running"
+    }
+    
 app.include_router(leaderboard_app_router)

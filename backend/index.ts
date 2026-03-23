@@ -44,6 +44,14 @@ app.use(bodyParser.json())
 
 app.use('/question', gameRecordRoute);
 
+// Health check route
+app.get("/health", (req: Request, res: Response) => {
+  res.status(200).json({
+    status: "ok",
+    message: "Backend is running",
+    db: mongoose.connection.readyState === 1 ? "connected" : "disconnected"
+  });
+});
 
 app.listen(process.env.PORT, () => {
     console.log(`\nserver started at http://localhost:`+process.env.PORT+'\n');
